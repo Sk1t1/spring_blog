@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<tr th:each="post: ${posts}">
+    email:
+    <td th:text="${post.getUserDto().getEmail()}"/>
+    id:
+    <td th:text="${post.getId()}"/>
+    title:
+    <td th:text="${post.getTitle()}"/>
+    text:
+    <td th:text="${post.getText()}"/>
+
+    likes:
+    <td th:text="${post.getLikeCount()}"/>
+
+    <a th:href="@{'/like/'+ ${post.getId()}}">like</a>
+    <a th:href="@{'/postPage/'+ ${post.getId()}}">post info</a>
+    <div th:if="${post.isCanRemove()}">
+        <a th:href="@{'/delete/'+ ${post.getId()}}">delete</a>
+    </div>
+
+    <!--    <a th:href="@{'/user?id='+ ${user.getId()}+'&name='+ ${user.getFirstName()}}">info</a>-->
+    <!--    <a th:href="@{'/user/delete/'+ ${user.getId()}}">delete</a>-->
+    <hr>
+</tr>
+
+<a href="/">home</a>
+
+</body>
+</html>

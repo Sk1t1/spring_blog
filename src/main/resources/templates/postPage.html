@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<img id="postImage">
+<hr>
+id: <p id="postId"></p>
+title: <p id="postTitle"></p>
+text: <p id="postText"></p>
+user: <p id="postUserEmail"></p>
+likes: <p id="likeCount"></p>
+
+
+<hr>
+<p>Comment</p>
+
+<label for="commentText">comment</label>
+<input id="commentText" type="text">
+<button onclick="addCommentToPost()">save comment</button>
+
+
+<hr>
+<h3>Comments</h3>
+
+<div id="commentsDiv">
+
+</div>
+
+
+<script type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+    window.onload = pageLoaded();
+
+    function pageLoaded() {
+        getPost();
+        getComments();
+        // getPhoto();
+    }
+
+    // function getPhoto(){
+    //     let href = window.location.href;
+    //     let strings = href.split('/');
+    //     let postId = strings.pop();
+    //
+    //     $.ajax({
+    //         type: "GET",
+    //         contentType: "application/json",
+    //         url: "/file/post/" + postId,
+    //         dataType: 'json',
+    //         cache: false,
+    //         timeout: 600000,
+    //         success: function (data) {
+    //             let base64File = data.base64File;
+    //             let postImg = document.getElementById('postImage');
+    //             postImg.src = 'data:image/png;base64, ' + base64File;
+    //
+    //         }
+    //     });
+    // }
+
+    function getComments() {
+        let href = window.location.href;
+        let strings = href.split('/');
+        let postId = strings.pop();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/comments/" + postId,
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                console.log(data);
+                insertComments(data);
+            }
+        });
+
+    }
+
+    function getPost() {
+        let href = window.location.href;
+        let strings = href.split('/');
+        let postId = strings.pop();
+        $.ajax({
+            type: "GET",
+            contentType: "application/json",
+            url: "/post/" + postId,
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                insertPostData(data);
+            }
+        });
+    }
+
+    function insertPostData(data) {
+        document.getElementById('postId').innerText = data.id;
+        document.getElementById('postTitle').innerText = data.title;
+        document.getElementById('postText').innerText = data.text;
+        document.getElementById('postUserEmail').innerText = data.userDto.email;
+        document.getElementById('likeCount').innerText = data.likeCount;
+        document.getElementById('postImage').src = data.fileUrl;
+
+    }
+
+    function addCommentToPost() {
+        let href = window.location.href;
+        let strings = href.split('/');
+        let postId = strings.pop();
+        let commentText = document.getElementById('commentText').value;
+
+        let request = {
+            "postId": postId,
+            "text": commentText
+        };
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/comment",
+            data: JSON.stringify(request),
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                console.log("SUCCESS : ", data);
+                // insertSingleComment(data);
+                let commentsDiv = document.getElementById('commentsDiv');
+                commentsDiv.innerHTML = '';
+                getComments();
+            },
+            error: function (error) {
+                console.log("ERROR : ", error);
+            }
+        });
+    }
+
+    function insertComments(comments) {
+        let commentsDiv = document.getElementById('commentsDiv');
+
+        for (let i = 0; i < comments.length; i++) {
+            let comment = comments[i];
+            let p = document.createElement('p');
+            p.innerText = 'userName:' + comment.userDto.email + ': ' + comment.text;
+            commentsDiv.append(p);
+        }
+
+    }
+
+    function insertSingleComment(comment) {
+        let commentsDiv = document.getElementById('commentsDiv');
+        let p = document.createElement('p');
+        p.innerText = 'userName:' + comment.userDto.email + ': ' + comment.text;
+        commentsDiv.append(p);
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>Hell</h1>
+
+<div>
+    <label for="title">title</label>
+    <input id="title" type="text" name="title">
+    <label for="text">text</label>
+    <input id="text" type="text" name="text">
+
+    <label for="postFile">upload file</label>
+    <input id="postFile" type="file" name="postFile">
+
+    <button onclick="uploadFile()" id="savePost">save</button>
+<!--    <button onclick="uploadFile()" id="uploadFile">save file</button>-->
+</div>
+
+
+<script type="text/javascript"
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    function savePost(fileId) {
+
+        let title = document.getElementById('title').value;
+        let text = document.getElementById('text').value;
+        console.log(title);
+        console.log(text);
+        console.log(fileId);
+
+        let request = {
+            'title': title,
+            'text': text,
+            'fileId': fileId
+        }
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/post",
+            data: JSON.stringify(request),
+            dataType: 'json',
+            cache: false,
+            timeout: 600000,
+            success: function (data) {
+                console.log(data);
+                window.location.href = '/';
+            },
+            error: function (error) {
+                console.log("ERROR : ", error);
+            }
+        });
+
+    }
+
+    function uploadFile() {
+        let formData = new FormData();
+        formData.append("file", postFile.files[0]);
+        $.ajax({
+            url: "/file",
+            type: 'POST',
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false, // tell jQuery not to process the data
+            contentType: false, // tell jQuery not to set contentType
+            cache: false,
+            success: function(res) {
+                savePost(res.id)
+            },
+            error: function(res) {
+                console.log('ERR: ' + res);
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
